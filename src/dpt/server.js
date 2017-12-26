@@ -146,7 +146,15 @@ class Server extends EventEmitter {
         break
 
       case 'neighbours':
-        this.emit('peers', info.data.peers.map((peer) => peer.endpoint))
+        console.log('info = '+JSON.stringify(info))
+        console.log('rinfo = '+JSON.stringify(rinfo))
+        // console.log('found peers. peers = '+JSON.stringify(info.data.peers))
+        this.emit('peers', info.data.peers.map((peer) => {
+          console.log('peer = '+JSON.stringify(peer))
+          // var aNode = peer.endpoint
+          // aNode.hostname = Buffer.from(peer.id.data).toString('hex')
+          return peer
+        }))
         break
     }
   }

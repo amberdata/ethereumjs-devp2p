@@ -8,7 +8,8 @@ const { pk2id } = require('../util')
 const KBucket = require('./kbucket')
 const BanList = require('./ban-list')
 const DPTServer = require('./server')
-
+var pg = require('pg');
+var conString = "postgres://pwang:%3EMwoYREUZIE%25z%40%21%5B@127.0.0.1/ethereum"
 const debug = createDebugLogger('devp2p:dpt')
 
 class DPT extends EventEmitter {
@@ -70,7 +71,32 @@ class DPT extends EventEmitter {
   }
 
   _onServerPeers (peers) {
-    for (let peer of peers) this.addPeer(peer).catch(() => {})
+    for (let peer of peers) {
+      console.log('_onServerPeers: peer = '+JSON.stringify(peer))
+      // console.log("peer.id.toString('hex') = "+peer.id.toString('hex'))
+      //_onServerPeers: peer = {"address":"18.217.101.169","udpPort":20000,"tcpPort":20000}
+      this.addPeer(peer).catch(() => {})
+    }
+    var uniquePeers = peers.filter(function(elem, pos, arr) {
+      return arr.indexOf(elem) == pos;
+    });
+    pg.connect(conString, function(err, client, done) {
+      if(err) {
+        return console.error('error fetching client from pool', err);
+      }
+      console.log('connected to postgres')
+      for (let peer of uniquePeers) {
+        if (peer.endpoint && peer.endpoint.address!='::') {
+          client.query('insert into active_node("ethereumId", timestamp, hostname, method) values($1,$2,$3,$4)',
+            [peer.id.toString('hex'), new Date(), peer.endpoint.address+':'+peer.endpoint.udpPort, 2], function(err, result) {
+            if(err) {
+              return console.error('error running query', err);
+            }
+          });
+        }
+      }
+      done()
+    });
   }
 
   async bootstrap (peer) {
