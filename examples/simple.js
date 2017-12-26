@@ -30,7 +30,8 @@ pg.connect(conString, function(err, client, done) {
   if(err) {
     return console.error('error fetching client from pool', err);
   }
-  client.query('select hostname from active_node order by timestamp desc limit 200',
+  // client.query('select hostname from active_node order by timestamp desc limit 200',
+  client.query('select hostname from (select hostname, max(timestamp) from active_node group by hostname order by max(timestamp) desc limit 600) as recent_active_nodes order by RANDOM() limit 200',
     [], function(err, result) {
       done()
     if(err) {
