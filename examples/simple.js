@@ -13,6 +13,10 @@ const Buffer = require('safe-buffer').Buffer
 // var conString = "postgres://pwang:%3EMwoYREUZIE%25z%40%21%5B@127.0.0.1/ethereum"
 var pg = require('pg')
 var conString = require('../src/database').conString
+var instanceId = parseInt(process.env.INSTANCE_ID, 10)
+console.log('instanceId = '+instanceId)
+var totalInstanceCount = parseInt(process.env.TOTAL_INSTANCE_COUNT, 10)
+var capacity = 200
 const PRIVATE_KEY = 'd772e3d6a001a38064dd23964dd2836239fa0e6cec8b28972a87460a17210fe9'
 var BOOTNODES = require('ethereum-common').bootstrapNodes.map((node) => {
   return {
@@ -33,8 +37,8 @@ pg.connect(conString, function(err, client, done) {
     return console.error('error fetching client from pool', err);
   }
   // client.query('select hostname from active_node order by timestamp desc limit 200',
-  client.query('select hostname from (select hostname, max(timestamp) from active_node group by hostname order by max(timestamp) desc limit 600) as recent_active_nodes order by RANDOM() limit 200',
-    [], function(err, result) {
+  client.query('select hostname from (select hostname, max(timestamp) as tRecent from active_node group by hostname order by tRecent desc limit $1) as recent_active_nodes order by tRecent desc limit $2 offset $3',
+    [capacity * totalInstanceCount, capacity, capacity * (instanceId-1)], function(err, result) {
       done()
     if(err) {
       return console.error('error running query', err);

@@ -22,7 +22,8 @@ export DATABASE_PORT=5432
 export DATABASE_DATABASE=ethereum
 export DATABASE_USERNAME='admin'
 export DATABASE_PASSWORD='admin'
-
+export INSTANCE_ID=1
+export TOTAL_INSTANCE_COUNT=3
 while true
 do
 	kill $(ps aux | grep 'examples/simple.js' | awk '{print $2}')
