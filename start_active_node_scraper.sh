@@ -20,8 +20,8 @@ echo 'start'
 export DATABASE_HOSTNAME=127.0.0.1
 export DATABASE_PORT=5432
 export DATABASE_DATABASE=ethereum
-export DATABASE_USERNAME='pwang'
-export DATABASE_PASSWORD='>MwoYREUZIE%z@!['
+export DATABASE_USERNAME='admin'
+export DATABASE_PASSWORD='admin'
 
 while true
 do
