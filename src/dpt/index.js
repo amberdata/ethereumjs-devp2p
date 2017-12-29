@@ -8,8 +8,9 @@ const { pk2id } = require('../util')
 const KBucket = require('./kbucket')
 const BanList = require('./ban-list')
 const DPTServer = require('./server')
+
 var pg = require('pg')
-var conString = "postgres://pwang:%3EMwoYREUZIE%25z%40%21%5B@127.0.0.1/ethereum"
+var conString = require('../database').conString
 var peersSet = new Set()
 const debug = createDebugLogger('devp2p:dpt')
 
