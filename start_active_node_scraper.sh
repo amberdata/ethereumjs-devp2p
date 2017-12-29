@@ -17,13 +17,23 @@
 #!/usr/bin/env bash
 echo 'start'
 
-export DATABASE_HOSTNAME=127.0.0.1
-export DATABASE_PORT=5432
-export DATABASE_DATABASE=ethereum
-export DATABASE_USERNAME='admin'
-export DATABASE_PASSWORD='admin'
-export INSTANCE_ID=1
-export TOTAL_INSTANCE_COUNT=3
+[ -z "${DATABASE_HOSTNAME}" ] && declare DATABASE_HOSTNAME="127.0.0.1"
+[ -z "${DATABASE_PORT}"     ] && declare DATABASE_PORT="5432"
+[ -z "${DATABASE_DATABASE}" ] && declare DATABASE_DATABASE="ethereum"
+[ -z "${DATABASE_USERNAME}" ] && declare DATABASE_USERNAME="admin"
+[ -z "${DATABASE_PASSWORD}" ] && declare DATABASE_PASSWORD="admin"
+
+[ -z "${INSTANCE_ID}"     ] && declare INSTANCE_ID="1"
+[ -z "${TOTAL_INSTANCE_COUNT}"     ] && declare TOTAL_INSTANCE_COUNT="3"
+
+DATABASE_HOSTNAME="${DATABASE_HOSTNAME}" \
+DATABASE_PORT="${DATABASE_PORT}"         \
+DATABASE_DATABASE="${DATABASE_DATABASE}" \
+DATABASE_USERNAME="${DATABASE_USERNAME}" \
+DATABASE_PASSWORD="${DATABASE_PASSWORD}" \
+INSTANCE_ID="${INSTANCE_ID}"         \
+TOTAL_INSTANCE_COUNT="${TOTAL_INSTANCE_COUNT}"         \
+
 while true
 do
 	kill $(ps aux | grep 'examples/simple.js' | awk '{print $2}')
