@@ -1,3 +1,4 @@
+require('console-stamp')(console, { pattern: 'dd/mm/yyyy HH:MM:ss.l' });
 const { EventEmitter } = require('events')
 const secp256k1 = require('secp256k1')
 const Buffer = require('safe-buffer').Buffer
@@ -97,23 +98,59 @@ class DPT extends EventEmitter {
         peersSet.add(peerIdString)
       }
     }
+    var peersNeededToAdd = []
     pg.connect(conString, function(err, client, done) {
       if(err) {
         return console.error('error fetching client from pool', err);
       }
       console.log('connected to postgres')
+      var lastSeen = new Date();
+      var lastSeenDateOnly = new Date(lastSeen.toDateString());
       for (let peer of uniquePeers) {
         if (peer.endpoint && peer.endpoint.address!='::') {
-          client.query('insert into active_node("ethereumId", timestamp, hostname, method) values($1,$2,$3,$4)',
-            [peer.id.toString('hex'), new Date(), peer.endpoint.address+':'+peer.endpoint.udpPort, 2], function(err, result) {
+          client.query('update active_node set timestamp = $1 where "ethereumId" = $2 and timestamp::date = $3', [lastSeen, peer.id.toString('hex'), lastSeenDateOnly], function(err, result) {
             if(err) {
               return console.error('error running query', err);
+            }
+            console.log("peer.id.toString('hex') = "+peer.id.toString('hex'))
+            console.log('update active_node result = '+JSON.stringify(result))
+            if (result.rowCount == 0) {
+              pg.connect(conString, function(err, client, done) {
+                if(err) {
+                  return console.error('error fetching client from pool', err);
+                }
+                console.log('connected to postgres')
+                client.query('insert into active_node("ethereumId", timestamp, hostname, method) values($1,$2,$3,$4)',
+                  [peer.id.toString('hex'), lastSeen, peer.endpoint.address+':'+peer.endpoint.udpPort, 2], function(err, result) {
+                  if(err) {
+                    return console.error('error running query', err);
+                  }
+                  console.log('result = '+JSON.stringify(result))
+                });
+                done();
+              });
             }
           });
         }
       }
       done()
     });
+    // pg.connect(conString, function(err, client, done) {
+    //   if(err) {
+    //     return console.error('error fetching client from pool', err);
+    //   }
+    //   console.log('connected to postgres')
+    //   var lastSeen = new Date();
+    //   for (let peer of peersNeededToAdd) {
+    //     client.query('insert into active_node("ethereumId", timestamp, hostname, method) values($1,$2,$3,$4)',
+    //       [peer.id.toString('hex'), lastSeen, peer.endpoint.address+':'+peer.endpoint.udpPort, 2], function(err, result) {
+    //       if(err) {
+    //         return console.error('error running query', err);
+    //       }
+    //     });
+    //   }
+    //   done();
+    // }
   }
 
   async bootstrap (peer) {
