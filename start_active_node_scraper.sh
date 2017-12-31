@@ -20,8 +20,8 @@ echo 'start'
 # [ -z "${DATABASE_HOSTNAME}" ] && declare DATABASE_HOSTNAME="127.0.0.1"
 # [ -z "${DATABASE_PORT}"     ] && declare DATABASE_PORT="5432"
 # [ -z "${DATABASE_DATABASE}" ] && declare DATABASE_DATABASE="ethereum"
-# [ -z "${DATABASE_USERNAME}" ] && declare DATABASE_USERNAME="pwang"
-# [ -z "${DATABASE_PASSWORD}" ] && declare DATABASE_PASSWORD=">MwoYREUZIE%z@!["
+# [ -z "${DATABASE_USERNAME}" ] && declare DATABASE_USERNAME="admin"
+# [ -z "${DATABASE_PASSWORD}" ] && declare DATABASE_PASSWORD="admin"
 #
 # [ -z "${INSTANCE_ID}"     ] && declare INSTANCE_ID="1"
 # [ -z "${TOTAL_INSTANCE_COUNT}"     ] && declare TOTAL_INSTANCE_COUNT="3"
