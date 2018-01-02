@@ -44,8 +44,8 @@ var BOOTNODES = require('ethereum-common').bootstrapNodes.map((node) => {
 //   if(err) {
 //     return console.error('error fetching client from pool', err);
 //   }
-//   // client.query('select hostname from active_node order by timestamp desc limit 200',
-//   client.query('select hostname from (select hostname, max(timestamp) as tRecent from active_node group by hostname order by tRecent desc limit $1) as recent_active_nodes order by tRecent desc limit $2 offset $3',
+//   // client.query('select hostname from node order by timestamp desc limit 200',
+//   client.query('select hostname from (select hostname, max(timestamp) as tRecent from node group by hostname order by tRecent desc limit $1) as recent_nodes order by tRecent desc limit $2 offset $3',
 //     [capacity * totalInstanceCount, capacity, capacity * (instanceId-1)], function(err, result) {
 //       done()
 //     if(err) {
@@ -71,7 +71,7 @@ async function main() {
   var hostnames = undefined
   try {
     // await client.query('BEGIN')
-    const { rows } = await client.query(`select hostname from active_node where ("lastAsked" is null or "lastAsked" < now() - interval '60' minute)  group by hostname, timestamp order by timestamp desc limit 200`, [])
+    const { rows } = await client.query(`select hostname from node where ("lastAsked" is null or "lastAsked" < now() - interval '60' minute)  group by hostname, timestamp order by timestamp desc limit 200`, [])
 
     // var filteredRows = rows.filter(function(elem, pos, arr) {
     //   return arr.indexOf(elem) == pos;
@@ -88,9 +88,9 @@ async function main() {
     }
     console.log("hostnames = "+JSON.stringify(hostnames))
     var current = new Date()
-    await client.query(`update active_node set "lastAsked" = $1 where hostname = any($2)`, [current, hostnames])
+    await client.query(`update node set "lastAsked" = $1 where hostname = any($2)`, [current, hostnames])
     // await client.query('COMMIT')
-    console.log("update active_node lastAsked successful")
+    console.log("update node lastAsked successful")
   } catch (e) {
     console.error('e = '+JSON.stringify(e))
     await client.query('ROLLBACK')
