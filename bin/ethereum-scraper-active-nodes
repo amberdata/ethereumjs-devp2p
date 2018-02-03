@@ -34,7 +34,7 @@ NODE_EXEC=$(which $APP_SERVER)
 STARTUP_TIMEOUT=180
 
 HOME_DIR="/home/ec2-user"
-APP_DIR="$HOME_DIR/$APP_NAME"
+APP_DIR="$HOME_DIR/ethereumjs-devp2p"
 CONFIG_DIR="$APP_DIR"
 PID_DIR="/var/run"
 PID_FILE="$PID_DIR/$APP_NAME.pid"
