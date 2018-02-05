@@ -1,0 +1,255 @@
+#!/bin/sh
+#
+#
+# chkconfig: - 20 80
+#
+#
+### BEGIN INIT INFO
+# provides: ethereum-scraper-active-nodes
+# Required-Start:    $network $remote_fs $local_fs
+# Required-Stop:     $network $remote_fs $local_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 2 6
+# Short-Description: start and stop ethereum-scraper-active-nodes
+# Description: start and stop ethereum-scraper-active-nodes
+### END INIT INFO
+
+###############
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+APP_NAME="ethereum-scraper-active-nodes"
+
+USER="root"
+GROUP="$USER"
+
+APP_SERVER="node"
+NODE_APP_NAME="simple"
+NODE_APP="-r babel-register examples/$NODE_APP_NAME.js"
+NODE_NAME="node"
+KWARGS=""
+NODE_STATUS="pgrep -f $NODE_APP_NAME.js"
+NODE_EXEC=$(which $APP_SERVER)
+STARTUP_TIMEOUT=180
+
+HOME_DIR="/home/ec2-user"
+APP_DIR="$HOME_DIR/ethereumjs-devp2p"
+CONFIG_DIR="$APP_DIR"
+PID_DIR="/var/run"
+PID_FILE="$PID_DIR/$APP_NAME.pid"
+LOG_DIR="/var/log"
+LOG_FILE="$LOG_DIR/$NODE_APP_NAME.log"
+
+# Source environment config
+ENV_CONFIG="/etc/sysconfig/$APP_NAME" || exit 1
+
+[ -z "${DB_HOSTNAME}"       ] && declare DB_HOSTNAME="localhost"
+[ -z "${DB_PORT}"           ] && declare DB_PORT="5432"
+[ -z "${DB_DATABASE}"       ] && declare DB_DATABASE="ethereum"
+[ -z "${DB_USERNAME}"       ] && declare DB_USERNAME="admin"
+[ -z "${DB_PASSWORD}"       ] && declare DB_PASSWORD="admin"
+
+[ -z "${LOG_LEVEL}" ] && declare LOG_LEVEL="info"
+
+USAGE="Usage: $0 {start|stop|kill|restart|status} [--force]"
+FORCE_OP=true
+
+pid_file_exists() {
+    [ -f "$PID_FILE" ]
+}
+
+get_pid() {
+  if pid_file_exists
+  then
+    echo "$(cat "$PID_FILE")"
+  else
+    echo $($NODE_STATUS)
+  fi
+}
+
+is_running() {
+    PID="$(get_pid)"
+    [ -d /proc/$PID ]
+}
+
+start_it() {
+    mkdir -p "$PID_DIR"
+    chown $USER:$GROUP "$PID_DIR"
+    mkdir -p "$LOG_DIR"
+    chown $USER:$GROUP "$LOG_DIR"
+
+    echo "Starting $APP_NAME ..."
+    cd $APP_DIR
+    exec $(NODE_CONFIG_DIR=$CONFIG_DIR LOG_LEVEL=$LOG_LEVEL DATABASE_HOSTNAME=$DB_HOSTNAME DATABASE_PORT=$DB_PORT DATABASE_DATABASE=$DB_DATABASE \
+           DATABASE_USERNAME=$DB_USERNAME DATABASE_PASSWORD=$DB_PASSWORD $NODE_EXEC $NODE_APP $KWARGS 1>>$LOG_FILE 2>&1 &)
+
+    n=0
+    until [ "$n" -ge "$STARTUP_TIMEOUT" ];
+    do
+       PID=$($NODE_STATUS)
+       if [ ! -z "$PID" ]
+       then
+          break
+       fi
+       n=$((n+1))
+       sleep .5
+    done
+
+    if [ -z "$PID" ]
+    then
+      echo "Timed out attempting to start process"
+      exit 1
+    fi
+    echo $PID > $PID_FILE
+    echo "$APP_NAME started with pid $(get_pid)"
+}
+
+stop_process() {
+    PID=$(get_pid)
+
+    if pid_file_exists
+    then
+      echo "Killing process $PID_FILE"
+      killproc -p "$PID_FILE"
+    fi
+
+    # shoot it in the head if still is_running
+    if is_running
+    then
+        pkill $NODE_NAME
+
+        if [ ! -z "$PID" ]
+        then
+          /bin/kill -9 $PID
+        fi
+    fi
+}
+
+remove_pid_file() {
+    echo "Removing pid file"
+    rm -f "$PID_FILE"
+}
+
+start_app() {
+
+    if pid_file_exists
+    then
+        if is_running
+        then
+            PID=$(get_pid)
+            echo "$APP_NAME already running with pid $PID"
+            exit 1
+        else
+            echo "$APP_NAME stopped, but pid file exists"
+            if [ $FORCE_OP = true ]
+            then
+                echo "Forcing start anyways"
+                remove_pid_file
+                start_it
+            fi
+        fi
+    else
+        start_it
+    fi
+}
+
+stop_app() {
+
+    PID=$(get_pid)
+
+    if pid_file_exists || [ ! -z "$PID" ]
+    then
+        if is_running
+        then
+            echo "Stopping $APP_NAME ..."
+            stop_process
+            remove_pid_file
+            echo "$APP_NAME stopped"
+        else
+            echo "$APP_NAME already stopped, but pid file exists"
+            if [ $FORCE_OP = true ]
+            then
+                echo "Forcing stop anyways ..."
+                kill_app
+                echo "$APP_NAME stopped"
+            else
+                exit 1
+            fi
+        fi
+    else
+        echo "$APP_NAME already stopped, pid file does not exist"
+        exit 1
+    fi
+}
+
+status_app() {
+
+    PID=$(get_pid)
+
+    if pid_file_exists || [ ! -z "$PID" ]
+    then
+        if is_running
+        then
+            PID=$(get_pid)
+            echo "$APP_NAME running with pid $PID"
+        else
+            echo "$APP_NAME stopped, but pid file exists"
+        fi
+    else
+        echo "$APP_NAME stopped"
+    fi
+}
+
+kill_app() {
+
+  echo "Force killing $APP_NAME ..."
+  stop_process
+  remove_pid_file
+  echo "$APP_NAME killed"
+
+}
+
+case "$2" in
+    --force)
+        FORCE_OP=true
+    ;;
+
+    "")
+    ;;
+
+    *)
+        echo $USAGE
+        exit 1
+    ;;
+esac
+
+case "$1" in
+    start)
+        start_app
+    ;;
+
+    stop)
+        stop_app
+    ;;
+
+    kill)
+        kill_app
+    ;;
+
+    restart)
+        stop_app
+        start_app
+    ;;
+
+    status)
+        status_app
+    ;;
+
+    *)
+        echo $USAGE
+        exit 1
+    ;;
+esac
+
+exit 0
