@@ -9,7 +9,6 @@ var conString = 'postgres://' +
 								process.env.DATABASE_PORT +
 								'/' +
 								process.env.DATABASE_DATABASE;
-console.log('conString = '+conString)
 module.exports = {
   'conString' : conString
 }

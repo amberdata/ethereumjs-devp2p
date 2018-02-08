@@ -75,10 +75,6 @@ class DPT extends EventEmitter {
 
   _onServerPeers (peers) {
     for (let peer of peers) {
-      console.log('_onServerPeers: peer = '+JSON.stringify(peer))
-      // console.log('_onServerPeers: peer.id.toString(\'hex\') = '+(typeof peer.id.toString('hex')))
-      // console.log("peer.id.toString('hex') = "+peer.id.toString('hex'))
-      //_onServerPeers: peer = {"address":"18.217.101.169","udpPort":20000,"tcpPort":20000}
       this.addPeer(peer).catch(() => {})
     }
     var filteredPeers = peers.filter(function(elem, pos, arr) {
@@ -103,7 +99,6 @@ class DPT extends EventEmitter {
       if(err) {
         return console.error('error fetching client from pool', err);
       }
-      console.log('connected to postgres')
       var lastSeen = new Date();
       var lastSeenDateOnly = new Date(lastSeen.toDateString());
       for (let peer of uniquePeers) {
@@ -112,20 +107,16 @@ class DPT extends EventEmitter {
             if(err) {
               return console.error('error running query', err);
             }
-            console.log("peer.id.toString('hex') = "+peer.id.toString('hex'))
-            console.log('update node result = '+JSON.stringify(result))
             if (result.rowCount == 0) {
               pg.connect(conString, function(err, client, done) {
                 if(err) {
                   return console.error('error fetching client from pool', err);
                 }
-                console.log('connected to postgres')
                 client.query('insert into node("nodeId", timestamp, hostname, method) values($1,$2,$3,$4)',
                   [peer.id.toString('hex'), lastSeen, peer.endpoint.address+':'+peer.endpoint.udpPort, 2], function(err, result) {
                   if(err) {
                     return console.error('error running query', err);
                   }
-                  console.log('result = '+JSON.stringify(result))
                 });
                 done();
               });
@@ -135,22 +126,6 @@ class DPT extends EventEmitter {
       }
       done()
     });
-    // pg.connect(conString, function(err, client, done) {
-    //   if(err) {
-    //     return console.error('error fetching client from pool', err);
-    //   }
-    //   console.log('connected to postgres')
-    //   var lastSeen = new Date();
-    //   for (let peer of peersNeededToAdd) {
-    //     client.query('insert into node("nodeId", timestamp, hostname, method) values($1,$2,$3,$4)',
-    //       [peer.id.toString('hex'), lastSeen, peer.endpoint.address+':'+peer.endpoint.udpPort, 2], function(err, result) {
-    //       if(err) {
-    //         return console.error('error running query', err);
-    //       }
-    //     });
-    //   }
-    //   done();
-    // }
   }
 
   async bootstrap (peer) {
