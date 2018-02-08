@@ -24,6 +24,7 @@ var BOOTNODES = require('ethereum-common').bootstrapNodes.map((node) => {
 
 main().catch(e => console.error(e.stack))
 async function main() {
+  console.log('main starts')
   const client = await pool.connect()
   var hostnames = undefined
   try {
@@ -54,6 +55,7 @@ async function main() {
     })
     BOOTNODES = BOOTNODES.concat(dynamic_boot_nodes)
     startBootstrap()
+    console.log('startBootstrap successful')
   }
 }
 
