@@ -73,7 +73,8 @@ class Server extends EventEmitter {
         if (this._requests.get(rkey) !== undefined) {
           debug(`ping timeout: ${peer.address}:${peer.udpPort} ${peer.id && peer.id.toString('hex')}`)
           this._requests.delete(rkey)
-          deferred.reject(new Error(`Timeout error: ping ${peer.address}:${peer.udpPort}`))
+          // deferred.reject(new Error(`Timeout error: ping ${peer.address}:${peer.udpPort}`))
+          deferred.reject(null)
         } else {
           return deferred.promise
         }
