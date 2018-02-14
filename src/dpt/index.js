@@ -112,7 +112,7 @@ class DPT extends EventEmitter {
                 if(err) {
                   return console.error('error fetching client from pool', err);
                 }
-                client.query('insert into node("nodeId", timestamp, hostname, method) values($1,$2,$3,$4)',
+                client.query('insert into node("nodeId", timestamp, hostname, method) values($1,$2,$3,$4) on conflict ("nodeId", timestamp) do nothing',
                   [peer.id.toString('hex'), lastSeen, peer.endpoint.address+':'+peer.endpoint.udpPort, 2], function(err, result) {
                   if(err) {
                     return console.error('error running query', err);
