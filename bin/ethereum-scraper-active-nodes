@@ -44,11 +44,11 @@ LOG_FILE="$LOG_DIR/$NODE_APP_NAME.log"
 # Source environment config
 ENV_CONFIG="/etc/sysconfig/$APP_NAME" || exit 1
 
-[ -z "${DB_HOSTNAME}"       ] && declare DB_HOSTNAME="localhost"
-[ -z "${DB_PORT}"           ] && declare DB_PORT="5432"
-[ -z "${DB_DATABASE}"       ] && declare DB_DATABASE="ethereum"
-[ -z "${DB_USERNAME}"       ] && declare DB_USERNAME="admin"
-[ -z "${DB_PASSWORD}"       ] && declare DB_PASSWORD="admin"
+[ -z "${DB_ETHEREUM_HOSTNAME}" ] && declare DB_ETHEREUM_HOSTNAME="localhost"
+[ -z "${DB_ETHEREUM_PORT}"     ] && declare DB_ETHEREUM_PORT="5432"
+[ -z "${DB_ETHEREUM_DATABASE}" ] && declare DB_ETHEREUM_DATABASE="ethereum"
+[ -z "${DB_ETHEREUM_USERNAME}" ] && declare DB_ETHEREUM_USERNAME="admin"
+[ -z "${DB_ETHEREUM_PASSWORD}" ] && declare DB_ETHEREUM_PASSWORD="admin"
 
 [ -z "${LOG_LEVEL}" ] && declare LOG_LEVEL="info"
 
@@ -81,8 +81,8 @@ start_it() {
 
     echo "Starting $APP_NAME ..."
     cd $APP_DIR
-    exec $(NODE_CONFIG_DIR=$CONFIG_DIR LOG_LEVEL=$LOG_LEVEL DATABASE_HOSTNAME=$DB_HOSTNAME DATABASE_PORT=$DB_PORT DATABASE_DATABASE=$DB_DATABASE \
-           DATABASE_USERNAME=$DB_USERNAME DATABASE_PASSWORD=$DB_PASSWORD $NODE_EXEC $NODE_APP $KWARGS 1>>$LOG_FILE 2>&1 &)
+    exec $(NODE_CONFIG_DIR=$CONFIG_DIR LOG_LEVEL=$LOG_LEVEL DATABASE_HOSTNAME=$DB_ETHEREUM_HOSTNAME DATABASE_PORT=$DB_ETHEREUM_PORT DATABASE_DATABASE=$DB_ETHEREUM_DATABASE \
+           DATABASE_USERNAME=$DB_ETHEREUM_USERNAME DATABASE_PASSWORD=$DB_ETHEREUM_PASSWORD $NODE_EXEC $NODE_APP $KWARGS 1>>$LOG_FILE 2>&1 &)
 
     n=0
     until [ "$n" -ge "$STARTUP_TIMEOUT" ];
