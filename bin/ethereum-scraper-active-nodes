@@ -43,6 +43,7 @@ LOG_FILE="$LOG_DIR/$NODE_APP_NAME.log"
 
 # Source environment config
 ENV_CONFIG="/etc/sysconfig/$APP_NAME" || exit 1
+. $ENV_CONFIG || exit 1
 
 [ -z "${DB_ETHEREUM_HOSTNAME}" ] && declare DB_ETHEREUM_HOSTNAME="localhost"
 [ -z "${DB_ETHEREUM_PORT}"     ] && declare DB_ETHEREUM_PORT="5432"
