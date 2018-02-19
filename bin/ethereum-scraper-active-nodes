@@ -56,6 +56,10 @@ ENV_CONFIG="/etc/sysconfig/$APP_NAME" || exit 1
 USAGE="Usage: $0 {start|stop|kill|restart|status} [--force]"
 FORCE_OP=true
 
+# Ensure pid and log dirs exist
+sudo mkdir -p "$PID_DIR"
+sudo mkdir -p "$LOG_DIR"
+
 pid_file_exists() {
     [ -f "$PID_FILE" ]
 }
@@ -75,9 +79,8 @@ is_running() {
 }
 
 start_it() {
-    sudo mkdir -p "$PID_DIR"
-    sudo mkdir -p "$LOG_DIR"
-    sudo chown $USER:$GROUP "$LOG_FILE"
+    sudo chown $USER:$GROUP "$PID_DIR"
+    sudo chown $USER:$GROUP "$LOG_DIR"
 
     echo "Starting $APP_NAME ..."
     cd $APP_DIR
