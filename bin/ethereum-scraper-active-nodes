@@ -21,7 +21,7 @@
 
 APP_NAME="ethereum-scraper-active-nodes"
 
-USER="root"
+USER="ec2-user"
 GROUP="$USER"
 
 APP_SERVER="node"
