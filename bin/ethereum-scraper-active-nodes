@@ -81,6 +81,7 @@ is_running() {
 start_it() {
     sudo chown $USER:$GROUP "$PID_DIR"
     sudo chown $USER:$GROUP "$LOG_DIR"
+    sudo chown $USER:$GROUP "$LOG_FILE"
 
     echo "Starting $APP_NAME ..."
     cd $APP_DIR
