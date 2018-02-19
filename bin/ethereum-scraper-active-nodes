@@ -75,10 +75,9 @@ is_running() {
 }
 
 start_it() {
-    mkdir -p "$PID_DIR"
-    chown $USER:$GROUP "$PID_DIR"
-    mkdir -p "$LOG_DIR"
-    chown $USER:$GROUP "$LOG_DIR"
+    sudo mkdir -p "$PID_DIR"
+    sudo mkdir -p "$LOG_DIR"
+    sudo chown $USER:$GROUP "$LOG_FILE"
 
     echo "Starting $APP_NAME ..."
     cd $APP_DIR
