@@ -36,6 +36,11 @@ if (args[0] == '--rinkeby') {
       "ip": "75.80.115.212",
       "port": 30303,
       "id": "364b6383e467c3da5cbd522958e9f74c636307c89283e26ee21efc40e1fb454efc388da31ce954c0ebc9b0216ae98ad2e0cbd0d13336e80a6c8b8c0eff109607"
+    },
+    {
+      "ip": "159.89.28.211",
+      "port": 30303,
+      "id": "b6b28890b006743680c52e64e0d16db57f28124885595fa03a562be1d2bf0f3a1da297d56b13da25fb992888fd556d4c1a27b1f39d531bde7de1921c90061cc6"
     }
   ];
 }
