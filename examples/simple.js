@@ -14,14 +14,39 @@ var conString = require('../src/database').conString
 var totalInstanceCount = parseInt(process.env.TOTAL_INSTANCE_COUNT, 10)
 var capacity = 200
 const PRIVATE_KEY = 'd772e3d6a001a38064dd23964dd2836239fa0e6cec8b28972a87460a17210fe9'
-var BOOTNODES = require('ethereum-common').bootstrapNodes.map((node) => {
+var common = require('ethereum-common')
+var args = process.argv.slice(2);
+if (args[0] == '--rinkeby') {
+  common.bootstrapNodes = [
+    {
+      "ip": "52.169.42.101",
+      "port": 30303,
+      "id": "a24ac7c5484ef4ed0c5eb2d36620ba4e4aa13b8c84684e1b4aab0cebea2ae45cb4d375b77eab56516d34bfbd3c1a833fc51296ff084b770b94fb9028c4d25ccf",
+      "location": "IE",
+      "comment": ""
+    },
+    {
+      "ip": "52.3.158.184",
+      "port": 30303,
+      "id": "343149e4feefa15d882d9fe4ac7d88f885bd05ebb735e547f12e12080a9fa07c8014ca6fd7f373123488102fe5e34111f8509cf0b7de3f5b44339c9f25e87cb8",
+      "location": "",
+      "comment": "INFURA"
+    },
+    {
+      "ip": "75.80.115.212",
+      "port": 30303,
+      "id": "364b6383e467c3da5cbd522958e9f74c636307c89283e26ee21efc40e1fb454efc388da31ce954c0ebc9b0216ae98ad2e0cbd0d13336e80a6c8b8c0eff109607"
+    }
+  ];
+}
+var BOOTNODES = common.bootstrapNodes.map((node) => {
   return {
     address: node.ip,
     udpPort: node.port,
     tcpPort: node.port
   }
 })
-
+console.log("static bootnodes = "+JSON.stringify(BOOTNODES))
 main().catch(e => console.error(e.stack))
 async function main() {
   console.log('main starts')
