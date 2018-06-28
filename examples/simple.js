@@ -17,6 +17,7 @@ const PRIVATE_KEY = 'd772e3d6a001a38064dd23964dd2836239fa0e6cec8b28972a87460a172
 var common = require('ethereum-common')
 var args = process.argv.slice(2);
 if (args[0] == '--rinkeby') {
+  console.log('we are on rinkeby!')
   common.bootstrapNodes = [
     {
       "ip": "52.169.42.101",
