@@ -10,6 +10,7 @@ const pool = new Pool({
   user: process.env.DATABASE_USERNAME,
   password: process.env.DATABASE_PASSWORD,
 })
+console.log('pool = '+pool.options.host+':'+pool.options.port)
 var conString = require('../src/database').conString
 var totalInstanceCount = parseInt(process.env.TOTAL_INSTANCE_COUNT, 10)
 var capacity = 200
