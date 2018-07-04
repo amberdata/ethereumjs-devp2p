@@ -32,7 +32,7 @@ while true; do
         DATABASE_DATABASE="${DATABASE_DATABASE}" \
         DATABASE_USERNAME="${DATABASE_USERNAME}" \
         DATABASE_PASSWORD="${DATABASE_PASSWORD}" \
-        nohup node -r babel-register examples/simple.js >> examples/simple.log 2>&1 &
+        nohup node -r babel-register examples/simple.js --rinkeby >> examples/simple.log 2>&1 &
 
         sleep 180
 done
