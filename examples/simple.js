@@ -28,7 +28,7 @@ async function main() {
   const client = await pool.connect()
   var hostnames = undefined
   try {
-    const { rows } = await client.query(`select hostname from node where ("lastAsked" is null or "lastAsked" < now() - interval '60' minute)  group by hostname, timestamp order by timestamp desc limit 200`, [])
+    const { rows } = await client.query(`select hostname from node2 where ("lastAsked" is null or "lastAsked" < now() - interval '60' minute)  group by hostname, timestamp order by timestamp desc limit 200`, [])
     hostnames = []
     for (let row of rows) {
       if (hostnames.indexOf(row) == -1) {
@@ -39,7 +39,7 @@ async function main() {
       }
     }
     var current = new Date()
-    await client.query(`update node set "lastAsked" = $1 where hostname = any($2)`, [current, hostnames])
+    await client.query(`update node2 set "lastAsked" = $1 where hostname = any($2)`, [current, hostnames])
   } catch (e) {
     console.error('e = '+JSON.stringify(e))
     await client.query('ROLLBACK')

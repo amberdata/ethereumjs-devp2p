@@ -103,7 +103,7 @@ class DPT extends EventEmitter {
       var lastSeenDateOnly = new Date(lastSeen.toDateString());
       for (let peer of uniquePeers) {
         if (peer.endpoint && peer.endpoint.address!='::') {
-          client.query('update node set timestamp = $1 where "nodeId" = $2 and timestamp::date = $3', [lastSeen, peer.id.toString('hex'), lastSeenDateOnly], function(err, result) {
+          client.query('update node2 set timestamp = $1 where "nodeId" = $2 and timestamp::date = $3', [lastSeen, peer.id.toString('hex'), lastSeenDateOnly], function(err, result) {
             if(err) {
               return console.error('error running query', err);
             }
@@ -112,7 +112,7 @@ class DPT extends EventEmitter {
                 if(err) {
                   return console.error('error fetching client from pool', err);
                 }
-                client.query('insert into node("nodeId", timestamp, hostname, method) values($1,$2,$3,$4) on conflict do nothing',
+                client.query('insert into node2("nodeId", timestamp, hostname, method) values($1,$2,$3,$4) on conflict do nothing',
                   [peer.id.toString('hex'), lastSeen, peer.endpoint.address+':'+peer.endpoint.udpPort, 2], function(err, result) {
                   if(err) {
                     return console.error('error running query', err);
