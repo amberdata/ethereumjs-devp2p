@@ -107,7 +107,7 @@ class DPT extends EventEmitter {
       for (let peer of uniquePeers) {
         console.log('peer = ' + JSON.stringify(peer))
         if (peer.endpoint && peer.endpoint.address!='::') {
-          client.query('delete from node2 where "nodeId" = $1 and timestamp >= $2 and timestamp < $3', [peer.id.toString('hex'), lastSeenDateOnlyLower, lastSeenDateOnlyUpper], function(err, result) {
+          client.query('delete from node where "nodeId" = $1 and timestamp >= $2 and timestamp < $3', [peer.id.toString('hex'), lastSeenDateOnlyLower, lastSeenDateOnlyUpper], function(err, result) {
             if(err) {
               return console.error('error running query', err);
             }
@@ -117,7 +117,7 @@ class DPT extends EventEmitter {
                 return console.error('error fetching client from pool', err);
               }
               console.log("peer.id.toString('hex') = " + peer.id.toString('hex') + ', lastSeen = ' + lastSeen.toString() + ', address&port = ' + peer.endpoint.address+':'+peer.endpoint.udpPort);
-              client.query('insert into node2("nodeId", timestamp, hostname, method) values($1,$2,$3,$4) on conflict do nothing',
+              client.query('insert into node("nodeId", timestamp, hostname, method) values($1,$2,$3,$4) on conflict do nothing',
                 [peer.id.toString('hex'), lastSeen, peer.endpoint.address+':'+peer.endpoint.udpPort, 2], function(err, result) {
                 if(err) {
                   return console.error('error running query', err);
