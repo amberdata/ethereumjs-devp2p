@@ -100,28 +100,35 @@ class DPT extends EventEmitter {
         return console.error('error fetching client from pool', err);
       }
       var lastSeen = new Date();
-      var lastSeenDateOnly = new Date(lastSeen.toDateString());
+      var lastSeenDateOnlyLower = new Date(lastSeen.toDateString());
+      var lastSeenDateOnlyUpper = new Date(lastSeenDateOnlyLower.getTime() + 24 * 3600 * 1000);
+      console.log('lastSeenDateOnlyLower = ' + lastSeenDateOnlyLower.toString());
+      console.log('lastSeenDateOnlyUpper = ' + lastSeenDateOnlyUpper.toString());
       for (let peer of uniquePeers) {
+        console.log('peer = ' + JSON.stringify(peer))
         if (peer.endpoint && peer.endpoint.address!='::') {
-          client.query('update node set timestamp = $1 where "nodeId" = $2 and timestamp::date = $3', [lastSeen, peer.id.toString('hex'), lastSeenDateOnly], function(err, result) {
+          client.query('delete from node where "nodeId" = $1 and timestamp >= $2 and timestamp < $3', [peer.id.toString('hex'), lastSeenDateOnlyLower, lastSeenDateOnlyUpper], function(err, result) {
             if(err) {
               return console.error('error running query', err);
             }
-            if (result.rowCount == 0) {
-              pg.connect(conString, function(err, client, done) {
+
+            pg.connect(conString, function(err, client, done) {
+              if(err) {
+                return console.error('error fetching client from pool', err);
+              }
+              console.log("peer.id.toString('hex') = " + peer.id.toString('hex') + ', lastSeen = ' + lastSeen.toString() + ', address&port = ' + peer.endpoint.address+':'+peer.endpoint.udpPort);
+              client.query('insert into node("nodeId", timestamp, hostname, method) values($1,$2,$3,$4) on conflict do nothing',
+                [peer.id.toString('hex'), lastSeen, peer.endpoint.address+':'+peer.endpoint.udpPort, 2], function(err, result) {
                 if(err) {
-                  return console.error('error fetching client from pool', err);
+                  return console.error('error running query', err);
                 }
-                client.query('insert into node("nodeId", timestamp, hostname, method) values($1,$2,$3,$4) on conflict do nothing',
-                  [peer.id.toString('hex'), lastSeen, peer.endpoint.address+':'+peer.endpoint.udpPort, 2], function(err, result) {
-                  if(err) {
-                    return console.error('error running query', err);
-                  }
-                });
-                done();
               });
-            }
+              done();
+            });
+
           });
+        } else {
+          console.log("peer.endpoint && peer.endpoint.address!='::' is false!");
         }
       }
       done()

@@ -28,10 +28,10 @@ async function main() {
   const client = await pool.connect()
   var hostnames = undefined
   try {
-    const { rows } = await client.query(`select hostname from node where ("lastAsked" is null or "lastAsked" < now() - interval '60' minute)  group by hostname, timestamp order by timestamp desc limit 200`, [])
+    const { rows } = await client.query(`select hostname from node where ("lastAsked" is null or "lastAsked" < now() - interval '60' minute) order by timestamp desc limit 2000`, [])
     hostnames = []
     for (let row of rows) {
-      if (hostnames.indexOf(row) == -1) {
+      if (hostnames.indexOf(row.hostname) == -1) {
         hostnames.push(row.hostname)
         if (hostnames.length >= 200) {
           break
