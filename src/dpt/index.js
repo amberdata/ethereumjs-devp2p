@@ -101,10 +101,9 @@ class DPT extends EventEmitter {
       }
       var lastSeen = new Date();
       var lastSeenDateOnlyLower = new Date(lastSeen.toDateString());
-      var lastSeenDateOnlyUpper = new Date();
-      lastSeenDateOnlyUpper.setDate(lastSeenDateOnlyLower.getDate() + 1);
-      console.log('lastSeenDateOnlyLower = ' + lastSeenDateOnlyLower.toString);
-      console.log('lastSeenDateOnlyUpper = ' + lastSeenDateOnlyUpper.toString);
+      var lastSeenDateOnlyUpper = new Date(lastSeenDateOnlyLower.getTime() + 24 * 3600 * 1000);
+      console.log('lastSeenDateOnlyLower = ' + lastSeenDateOnlyLower.toString());
+      console.log('lastSeenDateOnlyUpper = ' + lastSeenDateOnlyUpper.toString());
       for (let peer of uniquePeers) {
         console.log('peer = ' + JSON.stringify(peer))
         if (peer.endpoint && peer.endpoint.address!='::') {
