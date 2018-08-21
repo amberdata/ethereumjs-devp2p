@@ -28,7 +28,7 @@ async function main() {
   const client = await pool.connect()
   var hostnames = undefined
   try {
-    const { rows } = await client.query(`select hostname from node where ("lastAsked" is null or "lastAsked" < now() - interval '60' minute) order by timestamp desc limit 2000`, [])
+    const { rows } = await client.query(`select hostname from node where "lastAsked" >= now() - interval '1 day' and "lastAsked" < now() - interval '1 hour' group by hostname order by max("lastAsked") limit 200`, [])
     hostnames = []
     for (let row of rows) {
       if (hostnames.indexOf(row.hostname) == -1) {
